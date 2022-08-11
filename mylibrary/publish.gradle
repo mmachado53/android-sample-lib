@@ -1,7 +1,7 @@
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-version = PUBLISH_VERSION
+def libraryVersion = System.getenv('LIB_VERSION')
 
 // declare variables
 ext["signing.keyId"] = ''
@@ -29,12 +29,12 @@ publishing {
         release(MavenPublication) {
             groupId 'wayakdev.sample'
             artifactId 'sample-library'
-            version PUBLISH_VERSION
+            version libraryVersion
 
             if (project.plugins.findPlugin("com.android.library")) {
                 artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
             } else {
-                artifact("$buildDir/libs/${project.getName()}-${version}.jar")
+                artifact("$buildDir/libs/${project.getName()}-${libraryVersion}.jar")
             }
 
             pom {
@@ -98,5 +98,9 @@ publishing {
 }
 
 signing {
+    def signingKey = System.getenv('SIGNING_KEY')
+    def signingKeyId = System.getenv('SIGNING_KEY_ID')
+    def signingPassword = System.getenv('SIGNING_PASSWORD')
+    useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
     sign publishing.publications
 }
