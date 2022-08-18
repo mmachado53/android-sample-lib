@@ -1,12 +1,14 @@
 apply plugin: 'maven-publish'
 apply plugin: 'signing'
 
-def libraryVersion = System.getenv('LIB_VERSION')
-
 // declare variables
-ext["signing.keyId"] = ''
-ext["signing.password"] = ''
-ext["signing.secretKeyRingFile"] = ''
+ext["signing.keyId"] = System.getenv('SIGNING_KEY_ID') ?: ""
+ext["signing.password"] = System.getenv('SIGNING_PASSWORD') ?: ""
+ext["signing.secretKeyRingFile"] = System.getenv('SIGNING_SECRET_KEY_RING_FILE') ?: ""
+ext["ossrhUsername"] = System.getenv('REPO_CREDENTIAL_USER') ?: ""
+ext["ossrhPassword"] = System.getenv('REPO_CREDENTIAL_PASSWORD') ?: ""
+ext["libraryVersion"] = System.getenv('LIB_VERSION') ?: ""
+def secretKey =  System.getenv('SIGNING_KEY') ?: ""
 
 // load variables from local.properties OR env vars
 File secretPropsFile = project.rootProject.file('deploy.properties')
@@ -18,11 +20,10 @@ if (secretPropsFile.exists()) {
     p.each { name, value ->
         ext[name] = value
     }
-} else {
-    ext["signing.keyId"] = System.getenv('SIGNING_KEY_ID')
-    ext["signing.password"] = System.getenv('SIGNING_PASSWORD')
-    ext["signing.secretKeyRingFile"] = System.getenv('SIGNING_SECRET_KEY_RING_FILE')
 }
+
+def libraryVersion = ext["libraryVersion"]
+version = libraryVersion
 
 publishing {
     publications {
@@ -90,17 +91,19 @@ publishing {
             name = 'GitHubPackages'
             url = uri("https://maven.pkg.github.com/mmachado53/android-sample-lib")
             credentials {
-                username = System.getenv('REPO_CREDENTIAL_USER')
-                password = System.getenv('REPO_CREDENTIAL_PASSWORD')
+                username = ossrhUsername
+                password = ossrhPassword
             }
         }
     }
 }
 
+def keyId = ext["signing.keyId"]
+def password = ext["signing.password"]
+
 signing {
-    def signingKey = System.getenv('SIGNING_KEY')
-    def signingKeyId = System.getenv('SIGNING_KEY_ID')
-    def signingPassword = System.getenv('SIGNING_PASSWORD')
-    useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+    if(!secretKey.isEmpty()){
+        useInMemoryPgpKeys(keyId, secretKey, password)
+    }
     sign publishing.publications
 }
