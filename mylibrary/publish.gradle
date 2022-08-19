@@ -7,7 +7,6 @@ ext["signing.password"] = System.getenv('SIGNING_PASSWORD') ?: ""
 ext["signing.secretKeyRingFile"] = System.getenv('SIGNING_SECRET_KEY_RING_FILE') ?: ""
 ext["ossrhUsername"] = System.getenv('REPO_CREDENTIAL_USER') ?: ""
 ext["ossrhPassword"] = System.getenv('REPO_CREDENTIAL_PASSWORD') ?: ""
-ext["libraryVersion"] = System.getenv('LIB_VERSION') ?: ""
 def secretKey =  System.getenv('SIGNING_KEY') ?: ""
 
 // load variables from local.properties OR env vars
@@ -22,7 +21,7 @@ if (secretPropsFile.exists()) {
     }
 }
 
-def libraryVersion = ext["libraryVersion"]
+def libraryVersion = MY_LIB_VERSION
 version = libraryVersion
 
 publishing {
