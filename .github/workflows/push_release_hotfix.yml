@@ -18,8 +18,9 @@ jobs:
       - uses: actions/checkout@v3
       - run:  echo $(grep '^MY_LIB_VERSION.*$' gradle.properties | sed 's/\(.*\) \(.*\)/\2/')-SNAPSHOT-$(git rev-parse --short HEAD)
       - name: Overwriting library version for snapshot
-        run: SNAPSHOT_VERSION=$(grep '^MY_LIB_VERSION.*$' gradle.properties | sed 's/\(.*\) \(.*\)/\2/')-SNAPSHOT-$(git rev-parse --short HEAD)
-      - run: echo $SNAPSHOT_VERSION
+        run: |
+          SNAPSHOT_VERSION=$(grep '^MY_LIB_VERSION.*$' gradle.properties | sed 's/\(.*\) \(.*\)/\2/')-SNAPSHOT-$(git rev-parse --short HEAD)
+          echo $SNAPSHOT_VERSION
       - run: sed -i "s/MY_LIB_VERSION.*$/MY_LIB_VERSION = $(echo $SNAPSHOT_VERSION)/g" gradle.properties
       - run: grep '^MY_LIB_VERSION.*$' gradle.properties
       - name: Set up JDK 11
