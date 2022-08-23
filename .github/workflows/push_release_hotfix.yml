@@ -20,7 +20,8 @@ jobs:
       - name: Overwriting library version for snapshot
         run: |
           SNAPSHOT_VERSION=$(grep '^MY_LIB_VERSION.*$' gradle.properties | sed 's/\(.*\) \(.*\)/\2/')-SNAPSHOT-$(git rev-parse --short HEAD)
-          echo $SNAPSHOT_VERSION
+          sed -i "s/MY_LIB_VERSION.*$/MY_LIB_VERSION = $(echo $SNAPSHOT_VERSION)/g" gradle.properties
+          grep '^MY_LIB_VERSION.*$' gradle.properties
       - run: sed -i "s/MY_LIB_VERSION.*$/MY_LIB_VERSION = $(echo $SNAPSHOT_VERSION)/g" gradle.properties
       - run: grep '^MY_LIB_VERSION.*$' gradle.properties
       - name: Set up JDK 11
