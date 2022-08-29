@@ -1,0 +1,108 @@
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+// declare variables
+ext["signing.keyId"] = System.getenv('SIGNING_KEY_ID') ?: ""
+ext["signing.password"] = System.getenv('SIGNING_PASSWORD') ?: ""
+ext["signing.secretKeyRingFile"] = System.getenv('SIGNING_SECRET_KEY_RING_FILE') ?: ""
+ext["ossrhUsername"] = System.getenv('REPO_CREDENTIAL_USER') ?: ""
+ext["ossrhPassword"] = System.getenv('REPO_CREDENTIAL_PASSWORD') ?: ""
+def secretKey =  System.getenv('SIGNING_KEY') ?: ""
+
+// load variables from local.properties OR env vars
+File secretPropsFile = project.rootProject.file('deploy.properties')
+if (secretPropsFile.exists()) {
+    Properties p = new Properties()
+    new FileInputStream(secretPropsFile).withCloseable { is ->
+        p.load(is)
+    }
+    p.each { name, value ->
+        ext[name] = value
+    }
+}
+
+def libraryVersion = libVersion
+version = libVersion
+
+publishing {
+    publications {
+        release(MavenPublication) {
+            groupId 'wayakdev.sample'
+            artifactId 'sample-library'
+            version libraryVersion
+
+            if (project.plugins.findPlugin("com.android.library")) {
+                artifact("$buildDir/outputs/aar/${project.getName()}-release.aar")
+            } else {
+                artifact("$buildDir/libs/${project.getName()}-${libraryVersion}.jar")
+            }
+
+            pom {
+                name = 'sample-library'
+                description = 'Android library Sample'
+                url = 'https://github.com/mmachado53/android-sample-lib'
+                licenses {
+                    license {
+                        name = 'Apached-2.0'
+                        url = 'https://github.com/vouched/vouched-android/blob/master/LICENSE'
+                    }
+                }
+
+                // Version control info
+                scm {
+                    connection = 'scm:git:git://github.com/vouched/vouched-android.git'
+                    developerConnection = 'scm:git:ssh://github.com/mmachado53/android-sample-lib.git'
+                    url = 'https://github.com/mmachado53/android-sample-lib/master'
+                }
+
+                developers {
+                    developer {
+                        id = 'mmachado53'
+                        name = 'Miguel Machado'
+                        email = 'mmachado53@gmail.com'
+                    }
+                }
+
+                // Ensure POM will include any transitive dependencies
+                withXml {
+                    def dependenciesNode = asNode().appendNode('dependencies')
+                    project.configurations.api.allDependencies.each {
+                        def dependencyNode = dependenciesNode.appendNode('dependency')
+                        dependencyNode.appendNode('groupId', it.group)
+                        dependencyNode.appendNode('artifactId', it.name)
+                        dependencyNode.appendNode('version', it.version)
+                    }
+
+                    project.configurations.compileOnly.allDependencies.each {
+                        def dependencyNode = dependenciesNode.appendNode('dependency')
+                        dependencyNode.appendNode('groupId', it.group)
+                        dependencyNode.appendNode('artifactId', it.name)
+                        dependencyNode.appendNode('version', it.version)
+                        dependencyNode.appendNode('optional', true)
+                    }
+                }
+            }
+        }
+    }
+    // The repository to publish to, Sonatype/MavenCentral
+    repositories {
+        maven {
+            name = 'GitHubPackages'
+            url = uri("https://maven.pkg.github.com/mmachado53/android-sample-lib")
+            credentials {
+                username = ossrhUsername
+                password = ossrhPassword
+            }
+        }
+    }
+}
+
+def keyId = ext["signing.keyId"]
+def password = ext["signing.password"]
+
+signing {
+    if(!secretKey.isEmpty()){
+        useInMemoryPgpKeys(keyId, secretKey, password)
+    }
+    sign publishing.publications
+}
