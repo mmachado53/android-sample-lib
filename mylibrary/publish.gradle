@@ -21,8 +21,8 @@ if (secretPropsFile.exists()) {
     }
 }
 
-def libraryVersion = MY_LIB_VERSION
-version = libraryVersion
+def libraryVersion = libVersion
+version = libVersion
 
 publishing {
     publications {
