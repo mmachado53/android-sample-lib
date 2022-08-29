@@ -61,7 +61,7 @@ jobs:
         run: mkdir deploy
       - name: Copying the necessary files to the deploy folder
         run: |
-          cp -R ./app ./gradle .gitignore LICENSE build.gradle gradle.properties gradlew gradlew.bat settings.gradle ./deploy
+          cp -R version.txt ./app ./gradle .gitignore LICENSE build.gradle gradle.properties gradlew gradlew.bat settings.gradle ./deploy
           mkdir -p ./deploy/.github/workflows && cp -R .github/workflows-public/. ./deploy/.github/workflows
       - name: Remove private library references
         run: sed -i "s/include ':mylibrary'//g" ./deploy/settings.gradle && sed -i "s/implementation project(':mylibrary')/implementation \"wayakdev.sample:sample-library:\$MY_LIB_VERSION\"/g" ./deploy/app/build.gradle
