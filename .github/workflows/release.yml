@@ -24,6 +24,19 @@ jobs:
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
           arguments: build
+      - name: Assemble APK
+        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        with:
+          arguments: assembleDebug
+      - name: Printing Signing Report
+        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        with:
+          arguments: signingReport
+      - name: Upload APK to artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-debug.apk
+          path: app/build/outputs/apk/debug/app-debug.apk
       - name: Publish to GitHub packages repository
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
@@ -47,7 +60,9 @@ jobs:
       - name: Create deploy folder
         run: mkdir deploy
       - name: Copying the necessary files to the deploy folder
-        run: cp -R ./app ./gradle .gitignore LICENSE build.gradle gradle.properties gradlew gradlew.bat settings.gradle ./deploy
+        run: |
+          cp -R ./app ./gradle .gitignore LICENSE build.gradle gradle.properties gradlew gradlew.bat settings.gradle ./deploy
+          mkdir -p ./deploy/.github/workflows && cp -R .github/workflows-public/. ./deploy/.github/workflows
       - name: Remove private library references
         run: sed -i "s/include ':mylibrary'//g" ./deploy/settings.gradle && sed -i "s/implementation project(':mylibrary')/implementation \"wayakdev.sample:sample-library:\$MY_LIB_VERSION\"/g" ./deploy/app/build.gradle
       - name: Set up JDK 11
