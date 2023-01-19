@@ -24,18 +24,22 @@ jobs:
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
           arguments: build
-      - name: Assemble APK
+      - name: Assemble bundleRelease
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
           arguments: bundleRelease
       - name: Sign Release
-          uses: r0adkll/sign-android-release@v1
-          with:
-            releaseDirectory: app/build/outputs/bundle/release
-            signingKeyBase64: ${{ secrets.BUNDLE_SIGNING_KEY }}
-            alias: ${{ secrets.BUNDLE_SIGNING_KEY_ALIAS }}
-            keyStorePassword: ${{ secrets.BUNDLE_KEY_STORE_PASSWORD }}
-            keyPassword: ${{ secrets.BUNDLE_KEY_PASSWORD }}
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: app/build/outputs/bundle/release
+          signingKeyBase64: ${{ secrets.BUNDLE_SIGNING_KEY }}
+          alias: ${{ secrets.BUNDLE_SIGNING_KEY_ALIAS }}
+          keyStorePassword: ${{ secrets.BUNDLE_KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.BUNDLE_KEY_PASSWORD }}
+      - name: Assemble APK
+        uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+        with:
+          arguments: assembleDebug
       - name: Printing Signing Report
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
