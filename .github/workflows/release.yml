@@ -20,6 +20,16 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: 'adopt'
+      - name: Create service_account.json
+        run: echo '${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}' > service_account.json
+      - name: get properties from service_account.json
+        id: json_properties
+        uses: zoexx/github-action-json-file-properties@release
+        with:
+          file_path: "./service_account.json"
+      - run: |
+          echo ${{steps.json_properties.outputs.type}}
+          echo ${{steps.json_properties.outputs.project_id}}
       - name: Build with Gradle
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
@@ -36,15 +46,6 @@ jobs:
           alias: ${{ secrets.BUNDLE_SIGNING_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.BUNDLE_KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.BUNDLE_KEY_PASSWORD }}
-      - name: Create service_account.json
-        run: echo '${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}' > service_account.json
-      - name: Read service_account from file
-        id: service_account
-        uses: traversals-analytics-and-intelligence/file-reader-action@master
-        with:
-          file: ./service_account.json
-      - name: Get the service_account output
-        run: echo "${{ steps.service_account.outputs.content }}"
       - name: Deploy to Internal
         uses: r0adkll/upload-google-play@v1
         with:
