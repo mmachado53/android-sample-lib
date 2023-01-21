@@ -31,6 +31,11 @@ jobs:
           echo ${{steps.json_properties.outputs.type}}
           echo ${{steps.json_properties.outputs.project_id}}
           echo ${{github.run_number}}
+      - name: Bump version code
+        uses: chkfung/android-version-actions@v1.1
+        with:
+          gradlePath: app/build.gradle
+          versionCode: ${{github.run_number}}
       - name: Build with Gradle
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
