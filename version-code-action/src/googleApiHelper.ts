@@ -46,5 +46,5 @@ export const LastVersionCode = async (appId, serviceAccountJsonFile)=>{
                 
         }
     }
-    return result + 1;    
+    return result;    
 }
