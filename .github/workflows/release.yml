@@ -43,7 +43,7 @@ jobs:
         uses: chkfung/android-version-actions@v1.1
         with:
           gradlePath: app/build.gradle
-          versionCode: ${{github.run_number}}
+          versionCode: ${{steps.last_version_code.outputs.versionCode}}
       - name: Build with Gradle
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
@@ -60,6 +60,14 @@ jobs:
           alias: ${{ secrets.BUNDLE_SIGNING_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.BUNDLE_KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.BUNDLE_KEY_PASSWORD }}
+      - name: Deploy to Internal
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: service_account.json
+          packageName: wayakdev.sample.app
+          releaseFile: app/build/outputs/bundle/release/app-release.aab
+          track: internal
+          status: draft
       - name: Assemble APK
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
