@@ -1,22 +1,13 @@
 import * as google from '@googleapis/androidpublisher';
-const androidPublisher = google.androidpublisher('v3');
 import * as core from '@actions/core';
+import { androidpublisher_v3 } from "@googleapis/androidpublisher";
+
+import AndroidPublisher = androidpublisher_v3.Androidpublisher;
+
+
+const androidPublisher:AndroidPublisher  = google.androidpublisher('v3');
 
 let _editId = null;
-
-const getEditId = async (appId)=>{
-    if(_editId == null){
-        const editIdResponse = await androidPublisher.edits.insert({
-            auth: authClient,
-            packageName: appId
-        });
-        if(editIdResponse.status!=200 || editIdResponse.data.id == null){
-            throw new Error('Error getting an editId');
-        }
-        _editId = editIdResponse.data.id;
-    }
-    return _editId;
-}
 
 export const LastVersionCode = async (appId, serviceAccountJsonFile)=>{
     core.exportVariable("GOOGLE_APPLICATION_CREDENTIALS", serviceAccountJsonFile);
@@ -24,7 +15,14 @@ export const LastVersionCode = async (appId, serviceAccountJsonFile)=>{
         scopes: ['https://www.googleapis.com/auth/androidpublisher']
     });
     const authClient = await auth.getClient();
-    const editId = await getEditId(appId);
+    const editIdResponse = await androidPublisher.edits.insert({
+        auth: authClient,
+        packageName: appId
+    });
+    if(editIdResponse.status!=200 || editIdResponse.data.id == null){
+        throw new Error('Error getting an editId');
+    }
+    const editId = editIdResponse.data.id;
     const tracksResponse = await androidPublisher.edits.tracks.list({
             auth: authClient,
             packageName: appId,
@@ -35,7 +33,7 @@ export const LastVersionCode = async (appId, serviceAccountJsonFile)=>{
     }
     let result = -1;
     for(let trackIndex in tracksResponse.data.tracks ){
-        let track = tracks.data.tracks[trackIndex]
+        let track = tracksResponse.data.tracks[trackIndex]
         if(track && track.releases){
             for(let releaseIndex in track.releases){
                 let release = track.releases[releaseIndex];
