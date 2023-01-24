@@ -33,7 +33,7 @@ jobs:
           echo ${{github.run_number}}
       - name: Get last Version Code
         id: last_version_code
-        uses: mmachado53/google-play-version-code@v0.0.1
+        uses: mmachado53/google-play-version-code@v0.0.2
         with:
           serviceAccountJsonFile: service_account.json
           packageName: wayakdev.sample.app
