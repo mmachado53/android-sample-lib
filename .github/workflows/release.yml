@@ -31,6 +31,16 @@ jobs:
           echo ${{steps.json_properties.outputs.type}}
           echo ${{steps.json_properties.outputs.project_id}}
           echo ${{github.run_number}}
+      - name: Get last Version Code
+        id: last_version_code
+        uses: mmachado53/google-play-version-code@v0.0.1
+        with:
+          serviceAccountJsonFile: service_account.json
+          packageName: wayakdev.sample.app
+      - run: |
+          echo ${{steps.last_version_code.outputs.versionCode}}
+      - run: |
+          echo ${{steps.last_version_code.outputs.versionCode + 1}}
       - name: Bump version code
         uses: chkfung/android-version-actions@v1.1
         with:
@@ -52,14 +62,6 @@ jobs:
           alias: ${{ secrets.BUNDLE_SIGNING_KEY_ALIAS }}
           keyStorePassword: ${{ secrets.BUNDLE_KEY_STORE_PASSWORD }}
           keyPassword: ${{ secrets.BUNDLE_KEY_PASSWORD }}
-      - name: Deploy to Internal
-        uses: r0adkll/upload-google-play@v1
-        with:
-          serviceAccountJson: service_account.json
-          packageName: wayakdev.sample.app
-          releaseFile: app/build/outputs/bundle/release/app-release.aab
-          track: internal
-          status: draft
       - name: Assemble APK
         uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
         with:
