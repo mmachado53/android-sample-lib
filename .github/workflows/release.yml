@@ -39,8 +39,6 @@ jobs:
           packageName: wayakdev.sample.app
       - run: |
           echo ${{steps.last_version_code.outputs.versionCode}}
-      - run: |
-          echo ${{steps.last_version_code.outputs.versionCode + 1}}
       - name: Bump version code
         uses: chkfung/android-version-actions@v1.1
         with:
