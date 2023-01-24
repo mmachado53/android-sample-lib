@@ -1,12 +1,8 @@
 import * as google from '@googleapis/androidpublisher';
 const androidPublisher = google.androidpublisher('v3');
+import * as core from '@actions/core';
 
 let _editId = null;
-
-const auth = new google.auth.GoogleAuth({
-    scopes: ['https://www.googleapis.com/auth/androidpublisher']
-});
-const authClient = await auth.getClient();
 
 const getEditId = async (appId)=>{
     if(_editId == null){
@@ -22,7 +18,12 @@ const getEditId = async (appId)=>{
     return _editId;
 }
 
-export const LastVersionCode = async (appId)=>{
+export const LastVersionCode = async (appId, serviceAccountJsonFile)=>{
+    core.exportVariable("GOOGLE_APPLICATION_CREDENTIALS", serviceAccountJsonFile);
+    const auth = new google.auth.GoogleAuth({
+        scopes: ['https://www.googleapis.com/auth/androidpublisher']
+    });
+    const authClient = await auth.getClient();
     const editId = await getEditId(appId);
     const tracksResponse = await androidPublisher.edits.tracks.list({
             auth: authClient,

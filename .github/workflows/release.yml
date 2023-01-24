@@ -35,7 +35,7 @@ jobs:
         id: last_version_code
         uses: ./version-code-action
         with:
-          serviceAccountJsonFile: ./service_account.json
+          serviceAccountJsonFile: service_account.json
           packageName: wayakdev.sample.app
       - run: |
           echo ${{steps.last_version_code.outputs.versionCode}}
