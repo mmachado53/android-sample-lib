@@ -31,9 +31,9 @@ jobs:
           echo ${{steps.json_properties.outputs.type}}
           echo ${{steps.json_properties.outputs.project_id}}
           echo ${{github.run_number}}
-      - name: Get last Version Code
+      - name: Get the next version code
         id: last_version_code
-        uses: ./version-code-action
+        uses: mmachado53/google-play-next-version-code@v0.0.3
         with:
           serviceAccountJsonFile: service_account.json
           packageName: wayakdev.sample.app
