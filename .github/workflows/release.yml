@@ -95,7 +95,6 @@ jobs:
 
   sync:
     name: Publish to public repo
-    needs: [ publish ]
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
@@ -116,13 +115,10 @@ jobs:
           distribution: 'adopt'
       - name: Build sample code from the deploy folder
         run: cd ./deploy && ./gradlew build
-        env:
-          GITHUB_ACTOR: "mmachado53"
-          GITHUB_TOKEN: ${{ secrets.REPO_CREDENTIAL_PASSWORD }}
       - name: Pushes to the public repository
         uses: cpina/github-action-push-to-another-repository@main
         env:
-          API_TOKEN_GITHUB: ${{ secrets.REPO_CREDENTIAL_PASSWORD }}
+          SSH_DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
         with:
           source-directory: 'deploy'
           destination-github-username: 'mmachado53'
@@ -131,10 +127,11 @@ jobs:
           target-branch: main
       - name: Create release in public repo
         uses: ncipollo/release-action@v1
+        env:
+          SSH_DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
         with:
           tag: ${{ github.ref_name }}
           repo: "android-sample-lib-public"
           owner: "mmachado53"
           name: ${{ github.event.release.name }}
           body: ${{ github.event.release.body }}
-          token: ${{ secrets.REPO_CREDENTIAL_PASSWORD }}
