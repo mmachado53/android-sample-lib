@@ -12,6 +12,8 @@ permissions:
 jobs:
   publish:
     name: Assemble Debug APK
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
