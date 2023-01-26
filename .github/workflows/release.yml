@@ -95,6 +95,7 @@ jobs:
 
   sync:
     name: Publish to public repo
+    permissions: write-all
     if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
