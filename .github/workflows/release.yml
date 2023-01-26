@@ -120,11 +120,10 @@ jobs:
           target-branch: main
       - name: Create release in public repo
         uses: ncipollo/release-action@v1
-        env:
-          SSH_DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
         with:
           tag: ${{ github.ref_name }}
           repo: "android-sample-lib-public"
           owner: "mmachado53"
           name: ${{ github.event.release.name }}
           body: ${{ github.event.release.body }}
+          token: ${{ secrets.GITHUB_TOKEN }}
